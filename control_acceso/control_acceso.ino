@@ -4,15 +4,25 @@
 #include "RTClib.h"
 #include <SD.h>
 
+#include <Adafruit_NeoPixel.h>
+#ifdef __AVR__
+#include <avr/power.h>  // Required for 16 MHz Adafruit Trinket
+#endif
 
-#define PIN_SD 4   //Sd pin
-#define RST_PIN 5  // Reset pin rfid
-#define SS_PIN 53  // Slave pin rfid
+
+#define PINPIXELS 6  // On Trinket or Gemma, suggest changing this to 1
+#define NUMPIXELS 4  // P
+#define PIN_SD 4     //Sd pin
+#define RST_PIN 5    // Reset pin rfid
+#define SS_PIN 53    // Slave pin rfid
 #define BUZZER 9
 #define BTN 38
 #define RED_LED 30
 #define GREEN_LED 31
 #define BLUE_LED 32
+
+
+Adafruit_NeoPixel pixels(NUMPIXELS, PINPIXELS, NEO_GRB + NEO_KHZ800);
 
 
 // ----- CLOCK
@@ -55,8 +65,14 @@ void setup() {
   pinMode(GREEN_LED, OUTPUT);
   pinMode(BLUE_LED, OUTPUT);
   digitalWrite(lock, HIGH);
+  digitalWrite(BUZZER, HIGH);  //PNP
 
+#if defined(__AVR_ATtiny85__) && (F_CPU == 16000000)
+  clock_prescale_set(clock_div_1);
+#endif
+  // END of Trinket-specific code.
 
+  pixels.begin();
   SPI.begin();
   mfrc522.PCD_Init();
   // mfrc522.PCD_DumpVersionToSerial();
@@ -79,6 +95,15 @@ void setup() {
 }
 
 void loop() {
+  digitalWrite(BUZZER, HIGH);  //PNP
+
+  pixels.setPixelColor(0, pixels.Color(0, 150, 0));
+  pixels.setPixelColor(1, pixels.Color(0, 150, 0));
+  pixels.setPixelColor(2, pixels.Color(0, 150, 0));
+  pixels.setPixelColor(3, pixels.Color(0, 150, 0));
+  pixels.show();  // Send the updated pixel colors to the hardware.
+
+
   bool occupied_bathroom = true;
   digitalWrite(GREEN_LED, HIGH);
   digitalWrite(RED_LED, LOW);
@@ -97,19 +122,36 @@ void loop() {
   DateTime time = rtc.now();
 
   if (mfrc522.PICC_IsNewCardPresent() & mfrc522.PICC_ReadCardSerial()) {
-    Serial.println(F("**Card Detected:**"));
+    // Serial.println(F("**Card Detected:**"));
+
+
     // GET DATAT FROM TAG
     id_employee = get_hex_id();
 
+    // Serial.println(id_employee);
+
     first_name = get_first_name();
+
+    // Serial.println(first_name);
 
     last_name = get_last_name();
 
+    // Serial.println(last_name);
+
     if (id_employee != "") {
+      pixels.clear();  // Set all pixel colors to 'off'
+      pixels.setPixelColor(0, pixels.Color(150, 0, 0));
+      pixels.setPixelColor(1, pixels.Color(150, 0, 0));
+      pixels.setPixelColor(2, pixels.Color(150, 0, 0));
+      pixels.setPixelColor(3, pixels.Color(150, 0, 0));
+      pixels.show();  // Send the updated pixel colors to the hardware.
+
+
 
       buzzer_ok();
       open_door();
       register_entry();
+
       digitalWrite(GREEN_LED, LOW);
       digitalWrite(RED_LED, HIGH);
 
@@ -125,13 +167,13 @@ void loop() {
           buzzer_ok();
           open_door();
 
-
           while (compare) {
-            Serial.println("Coloca denuevo de tag");
+            // Serial.println("Coloca de nuevo el tag");
             bool card_comparation = true;
 
             while (card_comparation) {
-              check_tag_led();
+              // check_tag_led();
+              pixels_checkout();
               buzzer_alert();
 
               if (mfrc522.PICC_IsNewCardPresent() & mfrc522.PICC_ReadCardSerial()) {
@@ -157,19 +199,19 @@ void loop() {
             }
             compare = false;
           }
-
           occupied_bathroom = false;
         }
       }
     }
-  // read_data();
-
+    // read_data();
 
     //Resetting variables for a new reading
     id_employee = "";
     first_name = "";
     last_name = "";
     compare_employee = "";
+    pixels.clear();
+
     // mfrc522.PICC_HaltA();
     // mfrc522.PCD_StopCrypto1();
   } else if (!mfrc522.PICC_IsNewCardPresent()) {
@@ -183,12 +225,14 @@ void loop() {
   mfrc522.PCD_StopCrypto1();
 }
 //*****************************************************************************************//
-void to_string_compare(byte *buffer, byte bufferSize, String &hexValues) {
-  for (byte i = 0; i < bufferSize; i++) {
-    hexValues += (buffer[i] < 0x10 ? "0" : "");  // Añade un cero inicial si es necesario
-    hexValues += String(buffer[i], HEX);         // Concatena el valor hexadecimal
-  }
-}
+
+// ---------- Funcion anulada --------
+// void to_string_compare(byte *buffer, byte bufferSize, String &hexValues) {
+//   for (byte i = 0; i < bufferSize; i++) {
+//     hexValues += (buffer[i] < 0x10 ? "0" : "");  // Añade un cero inicial si es necesario
+//     hexValues += String(buffer[i], HEX);         // Concatena el valor hexadecimal
+//   }
+// }
 
 void to_string(byte *buffer, byte bufferSize, String &hexValues) {
   for (byte i = 0; i < bufferSize; i++) {

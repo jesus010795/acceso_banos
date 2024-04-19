@@ -1,7 +1,7 @@
 void open_door(){
-  digitalWrite(lock, LOW);   // activar el rele'
+  digitalWrite(lock, LOW); 
   Serial.println("Puerta abierta");
-  delay(5000);               // esperar un segundo
-  digitalWrite(lock, HIGH);    // apagar el rele'
+  delay(5000);           
+  digitalWrite(lock, HIGH);  
   delay(100);    
 }
