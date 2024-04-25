@@ -11,7 +11,7 @@
 
 
 #define PINPIXELS 6  // On Trinket or Gemma, suggest changing this to 1
-#define NUMPIXELS 4  // P
+#define NUMPIXELS 2  // P
 #define PIN_SD 4     //Sd pin
 #define RST_PIN 5    // Reset pin rfid
 #define SS_PIN 53    // Slave pin rfid
@@ -91,6 +91,7 @@ void setup() {
     while (1)
       ;
   }
+  // set_time();
   Serial.println("initialization done.");
 }
 
@@ -99,8 +100,6 @@ void loop() {
 
   pixels.setPixelColor(0, pixels.Color(0, 150, 0));
   pixels.setPixelColor(1, pixels.Color(0, 150, 0));
-  pixels.setPixelColor(2, pixels.Color(0, 150, 0));
-  pixels.setPixelColor(3, pixels.Color(0, 150, 0));
   pixels.show();  // Send the updated pixel colors to the hardware.
 
 
@@ -128,22 +127,22 @@ void loop() {
     // GET DATAT FROM TAG
     id_employee = get_hex_id();
 
-    // Serial.println(id_employee);
+    Serial.println(id_employee);
 
     first_name = get_first_name();
 
-    // Serial.println(first_name);
+    Serial.println(first_name);
 
     last_name = get_last_name();
 
-    // Serial.println(last_name);
+    Serial.println(last_name);
 
     if (id_employee != "") {
       pixels.clear();  // Set all pixel colors to 'off'
       pixels.setPixelColor(0, pixels.Color(150, 0, 0));
       pixels.setPixelColor(1, pixels.Color(150, 0, 0));
-      pixels.setPixelColor(2, pixels.Color(150, 0, 0));
-      pixels.setPixelColor(3, pixels.Color(150, 0, 0));
+      // pixels.setPixelColor(2, pixels.Color(150, 0, 0));
+      // pixels.setPixelColor(3, pixels.Color(150, 0, 0));
       pixels.show();  // Send the updated pixel colors to the hardware.
 
 
@@ -203,7 +202,7 @@ void loop() {
         }
       }
     }
-    // read_data();
+    read_data();
 
     //Resetting variables for a new reading
     id_employee = "";
@@ -224,15 +223,6 @@ void loop() {
   mfrc522.PICC_HaltA();
   mfrc522.PCD_StopCrypto1();
 }
-//*****************************************************************************************//
-
-// ---------- Funcion anulada --------
-// void to_string_compare(byte *buffer, byte bufferSize, String &hexValues) {
-//   for (byte i = 0; i < bufferSize; i++) {
-//     hexValues += (buffer[i] < 0x10 ? "0" : "");  // Añade un cero inicial si es necesario
-//     hexValues += String(buffer[i], HEX);         // Concatena el valor hexadecimal
-//   }
-// }
 
 void to_string(byte *buffer, byte bufferSize, String &hexValues) {
   for (byte i = 0; i < bufferSize; i++) {
