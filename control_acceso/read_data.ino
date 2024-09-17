@@ -1,5 +1,6 @@
 void read_data(){
   myFile = SD.open("registro.txt");
+  
   if (myFile) {
     Serial.println("registro.txt:");
 

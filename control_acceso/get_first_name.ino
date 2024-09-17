@@ -1,12 +1,13 @@
 String get_first_name() {
-  String value = "";
-
+  
+  String value = "Eli";
 
   byte buffer1[18];
   block = 4;
   len = 18;
 
  status = mfrc522.PCD_Authenticate(MFRC522::PICC_CMD_MF_AUTH_KEY_A, 4, &key, &(mfrc522.uid)); //line 834 of MFRC522.cpp file
+  
   if (status != MFRC522::STATUS_OK) {
     Serial.print(F("Authentication failed: "));
     Serial.println(mfrc522.GetStatusCodeName(status));

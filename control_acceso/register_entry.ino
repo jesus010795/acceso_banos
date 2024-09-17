@@ -3,9 +3,12 @@ void register_entry() {
   DateTime time = rtc.now();
 
   myFile = SD.open("registro.txt", FILE_WRITE);
+
   if (myFile) {
     Serial.println("Escribiendo fecha y hora de entrada en prueba: ");
+
     myFile.print(daysOfTheWeek[time.dayOfTheWeek()]);
+    
     myFile.print("/");
     myFile.print(first_name);
     myFile.print(last_name);
