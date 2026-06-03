@@ -123,4 +123,4 @@ El sistema implementado es un controlador de acceso que utiliza tecnología RFID
 
 16. Si no se detecta una nueva tarjeta presente, se detiene la comunicación con la tarjeta RFID y se sale del bucle principal.
 
-*Hay partes del código que están comentadas y parecen son fragmentos de funcionalidades que estaban en desarrollo y fueron desactivadas temporalmente.*
+*Hay partes del código que están comentadas y son fragmentos de funcionalidades que estaban en desarrollo y fueron desactivadas temporalmente.*
